@@ -196,10 +196,10 @@ vim.keymap.set('n', ',n', ':b#<CR>', { noremap = true, silent = true })
 vim.keymap.set('n', ',,', ':bn<CR>', { noremap = true, silent = true })
 vim.keymap.set('n', ',<', ':bn<CR>', { noremap = true, silent = true })
 
--- Quick reload of init.lua ("ss" mapping)
+-- Quick reload of all config files ("ss" mapping)
 vim.keymap.set('n', 'ss', function()
-  vim.cmd("source " .. vim.fn.stdpath("config") .. "/init.lua")
-end, { noremap = true, silent = true })
+  ReloadConfig()
+end, { noremap = true, silent = true, desc = "Reload all Neovim config files" })
 
 -- Swift open mappings
 vim.keymap.set('n', 'sos', ':Files ~/.my_env_settings<CR>', { noremap = true })
