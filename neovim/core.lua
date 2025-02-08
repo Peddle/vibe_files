@@ -394,7 +394,8 @@ end, {})
 -- Map Ctrl+P to run the ProjectFiles command.
 vim.keymap.set("n", "<C-p>", ":ProjectFiles<CR>", { noremap = true, silent = true })
 
--- Map leader-fp to print current file path
-vim.keymap.set("n", "<leader>fp", function()
-  print(get_current_buffer_path())
-end, { noremap = true, desc = "Print current file path" })
+-- Map leader-gp to yank current file path to default register
+vim.keymap.set("n", "<leader>gp", function()
+  vim.fn.setreg('"', get_current_buffer_path())
+  vim.notify("File path copied to register", vim.log.levels.INFO)
+end, { noremap = true, desc = "Copy file path to register" })
