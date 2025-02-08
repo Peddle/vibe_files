@@ -204,7 +204,7 @@ end, { noremap = true, silent = true, desc = "Reload all Neovim config files" })
 -- Swift open mappings
 vim.keymap.set('n', 'sos', ':Files ~/.my_env_settings<CR>', { noremap = true })
 vim.keymap.set('n', 'sot', ':terminal<CR>', { noremap = true })
-vim.keymap.set('n', 'soa', ':e term://aider --model sonnet', { noremap = true })
+vim.keymap.set('n', 'soa', ':e term://aider --model sonnet<CR>', { noremap = true })
 vim.keymap.set('n', 'sov', ':e term://aider --model sonnet<CR>/voice<CR>', { noremap = true })
 vim.keymap.set('n', 'sop', ':e ~/Code/<CR>', { noremap = true })
 vim.keymap.set('n', 'son', ':Files ~/.my_env_settings/Notes<CR>', { noremap = true })
