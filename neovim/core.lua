@@ -325,6 +325,17 @@ vim.keymap.set('n', '<leader>ch', ':split<CR>:e ~/.my_env_settings/Notes/copilot
 -- Save and close
 vim.keymap.set('n', '<leader>wq', ':wq<CR>', { noremap = true, silent = true })
 
+-- Function to reload Neovim configuration
+_G.ReloadConfig = function()
+    for name,_ in pairs(package.loaded) do
+        if name:match('^core') or name:match('^settings') or name:match('^plugins') then
+            package.loaded[name] = nil
+        end
+    end
+    dofile(vim.env.MYVIMRC)
+    vim.notify("Neovim configuration reloaded!", vim.log.levels.INFO)
+end
+
 -- Dark mode toggle function
 _G.ToggleDarkMode = function()
     if vim.o.background == 'dark' then
@@ -338,6 +349,9 @@ end
 
 -- Mapping for <leader>tdm
 vim.keymap.set('n', '<leader>tdm', ':lua ToggleDarkMode()<CR>', { noremap = true, silent = true })
+
+-- Mapping to reload configuration
+vim.keymap.set('n', '<leader>rc', ':lua ReloadConfig()<CR>', { noremap = true, silent = true, desc = "Reload Neovim config" })
 
 --===============================================
 -- Window Resizing
