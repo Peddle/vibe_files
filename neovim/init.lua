@@ -2,6 +2,9 @@
 -- init.lua – Consolidated remaps and settings
 --------------------------------------------------------------------------------
 
+-- Display hello world message
+vim.notify("ᐊᐃᓐᖓᐃ, ᓯᓚᕐᔪᐊᖅ!", vim.log.levels.INFO)
+
 require("core")
 require("settings")
 require("plugins")
