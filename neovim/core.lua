@@ -368,6 +368,11 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 
 
+-- Function to get current buffer's file path
+local function get_current_buffer_path()
+  return vim.fn.expand('%:p')
+end
+
 -- Function to find the Git repository root directory.
 local function find_git_root()
   local git_root = vim.fn.system("git rev-parse --show-toplevel 2> /dev/null")
@@ -388,3 +393,8 @@ end, {})
 
 -- Map Ctrl+P to run the ProjectFiles command.
 vim.keymap.set("n", "<C-p>", ":ProjectFiles<CR>", { noremap = true, silent = true })
+
+-- Map leader-fp to print current file path
+vim.keymap.set("n", "<leader>fp", function()
+  print(get_current_buffer_path())
+end, { noremap = true, desc = "Print current file path" })
