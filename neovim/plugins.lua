@@ -36,6 +36,20 @@ require("packer").startup(function(use)
   use { "nvim-treesitter/nvim-treesitter", run = ":TSUpdate" }
   use "folke/tokyonight.nvim"
   use "simeji/winresizer"
+  use { "MunifTanjim/nui.nvim" }  -- For UI components
+  use { "nvim-lua/plenary.nvim" }  -- Required for async operations
+  use {
+    'numToStr/Comment.nvim',
+    config = function()
+      require('Comment').setup({
+        -- Add your custom configuration here if needed
+        mappings = {
+          basic = true,  -- Enable basic mappings like `gc`
+          extra = true   -- Enable extra mappings like `gco`, `gcO`, `gcA`
+        }
+      })
+    end
+  }
 
   if packer_bootstrap then
     require("packer").sync()
@@ -113,6 +127,7 @@ vim.keymap.set("n", "<leader>fb", telescope_builtin.buffers, { desc = "Buffers l
 -- Git integration: vim-fugitive and gitsigns
 vim.keymap.set("n", "<leader>gs", ":Git<CR>", { desc = "Git status" })
 require("gitsigns").setup({
+  numhl = true,
   on_attach = function(bufnr)
     local gs = require("gitsigns")
     local function map(mode, lhs, rhs, opts)

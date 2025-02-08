@@ -5,6 +5,10 @@
 -- Use the system clipboard for all yank/paste operations.
 vim.opt.clipboard = "unnamedplus"
 
+-- Show line numbers and git signs in gutter
+vim.opt.number = true  -- Show line numbers
+vim.opt.signcolumn = "yes:1"
+
 -- New command to replace fzf ':Files' with Telescope
 vim.api.nvim_create_user_command("Files", function(opts)
   local cwd = (opts.args ~= "" and opts.args or vim.loop.cwd())
@@ -26,8 +30,13 @@ vim.g.mapleader = " "
 -- Remaps from copy.vim
 --------------------------------------------------------------------------------
 vim.keymap.set('n', '<leader>cp', function()
-  return vim.fn.CreateDefaultMakeCopyCommand(vim.fn.expand("%:t"))
-end, { expr = true, noremap = true, silent = true })
+  local current_file = vim.fn.expand("%:p")
+  local new_name = vim.fn.input("Copy to: ", current_file, "file")
+  if new_name ~= "" then
+    vim.cmd("saveas " .. vim.fn.fnameescape(new_name))
+    vim.notify("File copied to: " .. new_name, vim.log.levels.INFO)
+  end
+end, { noremap = true, silent = true })
 
 --===============================================
 -- Rename Remaps
@@ -36,51 +45,31 @@ end, { expr = true, noremap = true, silent = true })
 -- Remaps from rename.vim
 --------------------------------------------------------------------------------
 vim.keymap.set('n', '<leader>rn', function()
-  return vim.fn.CreateDefaultRenameCommand(vim.fn.expand("%:t"))
-end, { expr = true, noremap = true, silent = true })
+  vim.lsp.buf.rename()
+end, { noremap = true, silent = true })
 
 --===============================================
--- Coc Mappings
+-- Completion Mappings
 --===============================================
---------------------------------------------------------------------------------
--- Remaps from coc-settings.vim (wrapped in vim.cmd since they use complex Vimscript)
---------------------------------------------------------------------------------
-vim.cmd([[
-" Coc.nvim related mappings
-inoremap <silent><expr> <TAB> pumvisible() ? "\<C-n>" : COC_check_back_space() ? "\<TAB>" : coc#refresh()
-inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
-nmap <silent> <leader>C <Plug>(coc-diagnostic-prev)
-nmap <silent> <leader>c <Plug>(coc-diagnostic-next)
-nmap <silent> gd <Plug>(coc-definition)
-nmap <silent> gy <Plug>(coc-type-definition)
-nmap <silent> gi <Plug>(coc-implementation)
-nmap <silent> gr <Plug>(coc-references)
-" Removed mapping for K (which previously used <SID>show_documentation())
-xmap <leader>f  <Plug>(coc-format-selected)
-nmap <leader>f  <Plug>(coc-format-selected)
-xmap <leader>a  <Plug>(coc-codeaction-selected)
-nmap <leader>a  <Plug>(coc-codeaction-selected)
-nmap <leader>ac  <Plug>(coc-codeaction)
-nmap <leader>qf  <Plug>(coc-fix-current)
-xmap if <Plug>(coc-funcobj-i)
-omap if <Plug>(coc-funcobj-i)
-xmap af <Plug>(coc-funcobj-a)
-omap af <Plug>(coc-funcobj-a)
-xmap ic <Plug>(coc-classobj-i)
-omap ic <Plug>(coc-classobj-i)
-xmap ac <Plug>(coc-classobj-a)
-omap ac <Plug>(coc-classobj-a)
-nmap <silent> <C-s> <Plug>(coc-range-select)
-xmap <silent> <C-s> <Plug>(coc-range-select)
-nnoremap <silent><nowait> <space>cla  :<C-u>CocList diagnostics<cr>
-nnoremap <silent><nowait> <space>cle  :<C-u>CocList extensions<cr>
-nnoremap <silent><nowait> <space>clc  :<C-u>CocList commands<cr>
-nnoremap <silent><nowait> <space>clo  :<C-u>CocList outline<cr>
-nnoremap <silent><nowait> <space>cls  :<C-u>CocList -I symbols<cr>
-nnoremap <silent><nowait> <space>clj  :<C-u>CocNext<CR>
-nnoremap <silent><nowait> <space>clk  :<C-u>CocPrev<CR>
-nnoremap <silent><nowait> <space>clp  :<C-u>CocListResume<CR>
-]])
+local cmp = require('cmp')
+cmp.setup({
+  mapping = {
+    ['<Tab>'] = function(fallback)
+      if cmp.visible() then
+        cmp.select_next_item()
+      else
+        fallback()
+      end
+    end,
+    ['<S-Tab>'] = function(fallback)
+      if cmp.visible() then
+        cmp.select_prev_item()
+      else
+        fallback()
+      end
+    end,
+  }
+})
 
 --===============================================
 -- Core Navigation Remaps
@@ -135,7 +124,16 @@ vim.api.nvim_create_autocmd({"BufWinEnter", "WinEnter"}, {
 --------------------------------------------------------------------------------
 -- Remaps from grab-path.vim
 --------------------------------------------------------------------------------
-vim.keymap.set('n', '<leader>gp', ':call GrabPath()<CR>', { noremap = true, silent = true })
+vim.keymap.set('n', '<leader>gp', function()
+    -- Get git root
+    local git_root = vim.fn.system('git -C ' .. vim.fn.expand('%:p:h') .. ' rev-parse --show-toplevel'):gsub('\n', '')
+    -- Get absolute path of current file
+    local abs_path = vim.fn.expand('%:p')
+    -- Make path relative to git root
+    local rel_path = abs_path:sub(#git_root + 2) -- +2 to account for the trailing slash
+    vim.fn.setreg('+', rel_path)
+    vim.notify("Git relative path '" .. rel_path .. "' copied to clipboard", vim.log.levels.INFO)
+end, { noremap = true, desc = "Copy git-relative file path to clipboard" })
 
 --===============================================
 -- Custom Command Remaps
@@ -408,8 +406,10 @@ end, {})
 -- Map Ctrl+P to run the ProjectFiles command.
 vim.keymap.set("n", "<C-p>", ":ProjectFiles<CR>", { noremap = true, silent = true })
 
--- Map leader-gp to yank current file path to default register
-vim.keymap.set("n", "<leader>gp", function()
-  vim.fn.setreg('"', get_current_buffer_path())
-  vim.notify("File path copied to register", vim.log.levels.INFO)
-end, { noremap = true, desc = "Copy file path to register" })
+-- AI code rewrite mapping
+vim.keymap.set("v", "<leader>ai", function()
+    require("ai_rewrite").prompt_ai_rewrite()
+end, { noremap = true, silent = false, desc = "AI Rewrite Selected Code" })
+vim.keymap.set("n", "<leader>ai", function()
+    require("ai_rewrite").prompt_ai_insert()
+end, { noremap = true, silent = false, desc = "AI Rewrite Selected Code" })

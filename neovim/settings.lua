@@ -56,10 +56,10 @@ vim.fn.mkdir(tmpdir, "p")
 vim.opt.backupdir = tmpdir
 vim.opt.directory = tmpdir
 
--- Signcolumn:
--- Combine the sign column with the line numbers (if supported).
-vim.opt.signcolumn = "number"
-
+-- -- Signcolumn:
+-- -- Combine the sign column with the line numbers (if supported).
+-- vim.opt.signcolumn = "number"
+--
 --------------------------------------------------------------------------------
 -- End of settings.lua
 --------------------------------------------------------------------------------
