@@ -12,7 +12,7 @@ vim.opt.signcolumn = "yes:1"
 -- New command to replace fzf ':Files' with Telescope
 vim.api.nvim_create_user_command("Files", function(opts)
   local cwd = (opts.args ~= "" and opts.args or vim.loop.cwd())
-  require("telescope.builtin").find_files()
+  require("telescope.builtin").find_files({ cwd = cwd })
 end, { nargs = "?" })
 
 -- Map Ctrl-p in normal mode to Telescope's find_files
@@ -206,8 +206,10 @@ vim.keymap.set('n', 'soa', ':e term://aider --model sonnet<CR>', { noremap = tru
 vim.keymap.set('n', 'sov', ':e term://aider --model sonnet<CR>/voice<CR>', { noremap = true })
 vim.keymap.set('n', 'sop', ':e ~/Code/<CR>', { noremap = true })
 vim.keymap.set('n', 'son', ':Files ~/.my_env_settings/Notes<CR>', { noremap = true })
+vim.keymap.set('n', 'sorn', function()
+  require("telescope.builtin").live_grep({ cwd = vim.fn.expand("~/.my_env_settings/Notes") })
+end, { noremap = true })
 vim.keymap.set('n', 'soap', ':Files ~/.my_env_settings/prompts<CR>', { noremap = true })
-vim.keymap.set('n', 'c-p', ':Files<CR>', { noremap = true })
 
 -- Swift save note mappings
 vim.keymap.set('n', 'ssn', ':w ~/.my_env_settings/Notes/<CR>', { noremap = true })
@@ -338,10 +340,10 @@ end
 _G.ToggleDarkMode = function()
     if vim.o.background == 'dark' then
         vim.o.background = 'light'
-        vim.cmd[[colorscheme tokyonight-day]]
+        vim.cmd[[colorscheme catppuccin-latte]]
     else
         vim.o.background = 'dark'
-        vim.cmd[[colorscheme tokyonight-storm]]
+        vim.cmd[[colorscheme catppuccin-mocha]]
     end
 end
 
@@ -413,3 +415,9 @@ end, { noremap = true, silent = false, desc = "AI Rewrite Selected Code" })
 vim.keymap.set("n", "<leader>ai", function()
     require("ai_rewrite").prompt_ai_insert()
 end, { noremap = true, silent = false, desc = "AI Rewrite Selected Code" })
+
+-- Windsurf integration
+vim.keymap.set('n', '<leader>ws', function()
+    local cwd = vim.fn.getcwd()
+    vim.fn.system('windsurf ' .. vim.fn.shellescape(cwd))
+end, { noremap = true, desc = "Open Windsurf in current directory" })
