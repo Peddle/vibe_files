@@ -87,6 +87,12 @@ end, { nargs = '?', desc = 'Rename current tab' })
 -- Keybinding for quick tab rename
 vim.keymap.set('n', '<leader>tn', ':TabRename ', { noremap = true, desc = 'Rename current tab' })
 
+-- Select entire file with <leader>a
+vim.keymap.set('n', '<leader>all', 'ggVG', { desc = 'Select entire file' })
+
+-- Buffer management
+vim.keymap.set('n', '<C-q>', ':bd<CR>', { noremap = true, silent = true, desc = 'Delete buffer' })
+
 -- Set up tab name display in tabline
 vim.opt.showtabline = 2  -- Always show tabline
 vim.opt.tabline = '%!v:lua.custom_tabline()'
@@ -118,3 +124,13 @@ _G.custom_tabline = function()
     tabline = tabline .. '%#TabLineFill#%T'
     return tabline
 end
+
+-- Temporary debug function
+vim.api.nvim_create_user_command('CheckMap', function()
+  local maps = vim.api.nvim_get_keymap('n')
+  for _, map in ipairs(maps) do
+    if map.lhs:match("^<C%-w><C%-w>") or map.lhs:match("^<C%-w>w") then
+      print(string.format("Found mapping: %s -> %s", map.lhs, map.rhs or "(lua function)"))
+    end
+  end
+end, {})
