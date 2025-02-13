@@ -9,15 +9,21 @@ package.path = config_path .. "/?.lua;" .. package.path
 -- Display hello world message
 vim.notify("ᐊᐃᓐᖓᐃ, ᓯᓚᕐᔪᐊᖅ!", vim.log.levels.INFO)
 
-require("core")
-require("settings")
-require("plugins")
-
 -- Set up colorscheme
 vim.o.termguicolors = true
 
 -- Force true color support
 vim.env.NVIM_TUI_ENABLE_TRUE_COLOR = 1
+
+-- Load plugins first
+require("plugins")
+
+-- Load LSP configuration
+require('lsp')
+
+-- Then load configurations
+pcall(require, "core")
+pcall(require, "settings")
 
 require("catppuccin").setup({
     flavour = "mocha",

@@ -49,8 +49,8 @@ local function save_profiles(threshold)
 end
 
 time([[Luarocks path setup]], true)
-local package_path_str = "/Users/aaronpeddle/.cache/nvim/packer_hererocks/2.1.1713484068/share/lua/5.1/?.lua;/Users/aaronpeddle/.cache/nvim/packer_hererocks/2.1.1713484068/share/lua/5.1/?/init.lua;/Users/aaronpeddle/.cache/nvim/packer_hererocks/2.1.1713484068/lib/luarocks/rocks-5.1/?.lua;/Users/aaronpeddle/.cache/nvim/packer_hererocks/2.1.1713484068/lib/luarocks/rocks-5.1/?/init.lua"
-local install_cpath_pattern = "/Users/aaronpeddle/.cache/nvim/packer_hererocks/2.1.1713484068/lib/lua/5.1/?.so"
+local package_path_str = "/Users/aaronpeddle/.cache/nvim/packer_hererocks/2.1.1736781742/share/lua/5.1/?.lua;/Users/aaronpeddle/.cache/nvim/packer_hererocks/2.1.1736781742/share/lua/5.1/?/init.lua;/Users/aaronpeddle/.cache/nvim/packer_hererocks/2.1.1736781742/lib/luarocks/rocks-5.1/?.lua;/Users/aaronpeddle/.cache/nvim/packer_hererocks/2.1.1736781742/lib/luarocks/rocks-5.1/?/init.lua"
+local install_cpath_pattern = "/Users/aaronpeddle/.cache/nvim/packer_hererocks/2.1.1736781742/lib/lua/5.1/?.so"
 if not string.find(package.path, package_path_str, 1, true) then
   package.path = package.path .. ';' .. package_path_str
 end
@@ -75,7 +75,7 @@ time([[try_loadstring definition]], false)
 time([[Defining packer_plugins]], true)
 _G.packer_plugins = {
   ["Comment.nvim"] = {
-    config = { "\27LJ\2\nh\0\0\4\0\6\0\t6\0\0\0'\2\1\0B\0\2\0029\0\2\0005\2\4\0005\3\3\0=\3\5\2B\0\2\1K\0\1\0\rmappings\1\0\1\rmappings\0\1\0\2\nbasic\2\nextra\2\nsetup\fComment\frequire\0" },
+    config = { "\27LJ\2\nh\0\0\4\0\6\0\t6\0\0\0'\2\1\0B\0\2\0029\0\2\0005\2\4\0005\3\3\0=\3\5\2B\0\2\1K\0\1\0\rmappings\1\0\1\rmappings\0\1\0\2\nextra\2\nbasic\2\nsetup\fComment\frequire\0" },
     loaded = true,
     path = "/Users/aaronpeddle/.local/share/nvim/site/pack/packer/start/Comment.nvim",
     url = "https://github.com/numToStr/Comment.nvim"
@@ -86,7 +86,7 @@ _G.packer_plugins = {
     url = "https://github.com/L3MON4D3/LuaSnip"
   },
   ["avante.nvim"] = {
-    config = { "\27LJ\2\næ\3\0\0\4\0\f\0\0186\0\0\0'\2\1\0B\0\2\0029\0\2\0B\0\1\0016\0\0\0'\2\3\0B\0\2\0029\0\4\0005\2\5\0005\3\6\0=\3\a\0025\3\b\0=\3\t\0025\3\n\0=\3\v\2B\0\2\1K\0\1\0\fwindows\1\0\3\rposition\nright\nwidth\3\30\twrap\2\14behaviour\1\0\a\29auto_set_highlight_group\2\21auto_suggestions\1\26enable_token_counting\2\18minimize_diff\2!support_paste_from_clipboard\2%auto_apply_diff_after_generation\1\21auto_set_keymaps\2\vclaude\1\0\4\rendpoint\30https://api.anthropic.com\16temperature\3\0\nmodel\31claude-3-5-sonnet-20241022\15max_tokens\3€ \1\0\4\fwindows\0\vclaude\0\14behaviour\0\rprovider\vclaude\nsetup\vavante\tload\15avante_lib\frequire\0" },
+    config = { "\27LJ\2\næ\3\0\0\4\0\f\0\0186\0\0\0'\2\1\0B\0\2\0029\0\2\0B\0\1\0016\0\0\0'\2\3\0B\0\2\0029\0\4\0005\2\5\0005\3\6\0=\3\a\0025\3\b\0=\3\t\0025\3\n\0=\3\v\2B\0\2\1K\0\1\0\fwindows\1\0\3\twrap\2\nwidth\3\30\rposition\nright\14behaviour\1\0\a\21auto_set_keymaps\2\29auto_set_highlight_group\2\21auto_suggestions\1\26enable_token_counting\2\18minimize_diff\2!support_paste_from_clipboard\2%auto_apply_diff_after_generation\1\vclaude\1\0\4\15max_tokens\3€ \rendpoint\30https://api.anthropic.com\16temperature\3\0\nmodel\31claude-3-5-sonnet-20241022\1\0\4\14behaviour\0\fwindows\0\vclaude\0\rprovider\vclaude\nsetup\vavante\tload\15avante_lib\frequire\0" },
     loaded = true,
     path = "/Users/aaronpeddle/.local/share/nvim/site/pack/packer/start/avante.nvim",
     url = "https://github.com/yetone/avante.nvim"
@@ -211,11 +211,11 @@ _G.packer_plugins = {
 time([[Defining packer_plugins]], false)
 -- Config for: avante.nvim
 time([[Config for avante.nvim]], true)
-try_loadstring("\27LJ\2\næ\3\0\0\4\0\f\0\0186\0\0\0'\2\1\0B\0\2\0029\0\2\0B\0\1\0016\0\0\0'\2\3\0B\0\2\0029\0\4\0005\2\5\0005\3\6\0=\3\a\0025\3\b\0=\3\t\0025\3\n\0=\3\v\2B\0\2\1K\0\1\0\fwindows\1\0\3\rposition\nright\nwidth\3\30\twrap\2\14behaviour\1\0\a\29auto_set_highlight_group\2\21auto_suggestions\1\26enable_token_counting\2\18minimize_diff\2!support_paste_from_clipboard\2%auto_apply_diff_after_generation\1\21auto_set_keymaps\2\vclaude\1\0\4\rendpoint\30https://api.anthropic.com\16temperature\3\0\nmodel\31claude-3-5-sonnet-20241022\15max_tokens\3€ \1\0\4\fwindows\0\vclaude\0\14behaviour\0\rprovider\vclaude\nsetup\vavante\tload\15avante_lib\frequire\0", "config", "avante.nvim")
+try_loadstring("\27LJ\2\næ\3\0\0\4\0\f\0\0186\0\0\0'\2\1\0B\0\2\0029\0\2\0B\0\1\0016\0\0\0'\2\3\0B\0\2\0029\0\4\0005\2\5\0005\3\6\0=\3\a\0025\3\b\0=\3\t\0025\3\n\0=\3\v\2B\0\2\1K\0\1\0\fwindows\1\0\3\twrap\2\nwidth\3\30\rposition\nright\14behaviour\1\0\a\21auto_set_keymaps\2\29auto_set_highlight_group\2\21auto_suggestions\1\26enable_token_counting\2\18minimize_diff\2!support_paste_from_clipboard\2%auto_apply_diff_after_generation\1\vclaude\1\0\4\15max_tokens\3€ \rendpoint\30https://api.anthropic.com\16temperature\3\0\nmodel\31claude-3-5-sonnet-20241022\1\0\4\14behaviour\0\fwindows\0\vclaude\0\rprovider\vclaude\nsetup\vavante\tload\15avante_lib\frequire\0", "config", "avante.nvim")
 time([[Config for avante.nvim]], false)
 -- Config for: Comment.nvim
 time([[Config for Comment.nvim]], true)
-try_loadstring("\27LJ\2\nh\0\0\4\0\6\0\t6\0\0\0'\2\1\0B\0\2\0029\0\2\0005\2\4\0005\3\3\0=\3\5\2B\0\2\1K\0\1\0\rmappings\1\0\1\rmappings\0\1\0\2\nbasic\2\nextra\2\nsetup\fComment\frequire\0", "config", "Comment.nvim")
+try_loadstring("\27LJ\2\nh\0\0\4\0\6\0\t6\0\0\0'\2\1\0B\0\2\0029\0\2\0005\2\4\0005\3\3\0=\3\5\2B\0\2\1K\0\1\0\rmappings\1\0\1\rmappings\0\1\0\2\nextra\2\nbasic\2\nsetup\fComment\frequire\0", "config", "Comment.nvim")
 time([[Config for Comment.nvim]], false)
 
 _G._packer.inside_compile = false
