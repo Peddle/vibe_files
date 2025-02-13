@@ -268,9 +268,6 @@ vim.keymap.set('n', 'sdk', ':lua sdk()<CR>', { noremap = true, silent = true })
 vim.keymap.set('n', 'syj', ':lua syj()<CR>', { noremap = true, silent = true })
 vim.keymap.set('n', 'syk', ':lua syk()<CR>', { noremap = true, silent = true })
 
--- <leader>p mapping for changing directory
-vim.keymap.set('n', '<leader>p', '<Esc>:cd ~/Code/<C-z>', { noremap = true, silent = true })
-
 -- <leader>j and <leader>k for moving to next/previous block
 vim.keymap.set('n', '<leader>j', '}', { noremap = true })
 vim.keymap.set('n', '<leader>k', '{', { noremap = true })
