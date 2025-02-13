@@ -112,15 +112,15 @@ _G.custom_tabline = function()
         tabline = tabline .. '%' .. i .. 'T'
         
         -- Get custom name or default to tab number
-        local custom_name = vim.t[i].custom_tab_name
-        if custom_name then
+        local success, custom_name = pcall(function() return vim.t[i].custom_tab_name end)
+        if success and custom_name then
             tabline = tabline .. ' ' .. custom_name .. ' '
         else
             tabline = tabline .. ' Tab ' .. i .. ' '
         end
     end
     
-    -- Fill the rest of the tabline
+    -- Fill the rest of the line
     tabline = tabline .. '%#TabLineFill#%T'
     return tabline
 end
