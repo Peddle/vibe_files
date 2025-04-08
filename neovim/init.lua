@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
 -- init.lua – Consolidated remaps and settings
 --------------------------------------------------------------------------------
+-- Set the leader key to space.
+vim.g.mapleader = " "
 
 -- Add the current directory to the Lua package path
 local config_path = vim.fn.stdpath('config')

@@ -20,8 +20,6 @@ vim.keymap.set("n", "<C-p>", function()
   require("telescope.builtin").find_files()
 end, { desc = "Telescope find files" })
 
--- Set the leader key to space.
-vim.g.mapleader = " "
 
 --===============================================
 -- Copy Remaps
