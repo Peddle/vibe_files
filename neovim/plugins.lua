@@ -73,6 +73,113 @@ require("packer").startup(function(use)
   use "saadparwaiz1/cmp_luasnip"
   use "L3MON4D3/LuaSnip"
   use "rafamadriz/friendly-snippets"
+  -- Add conform.nvim for formatting
+  use {
+    'stevearc/conform.nvim',
+    requires = { "nvim-lua/plenary.nvim" },
+    opts = function()
+      local project_utils = require('utils.project')
+      local Path = require('plenary.path') -- Still need Path for config file check
+
+      return {
+        notify_on_error = false,
+        format_on_save = function(bufnr)
+          -- Disable format-on-save for files larger than 1MB to prevent performance issues
+          local file_size = vim.loop.fs_stat(vim.api.nvim_buf_get_name(bufnr))
+          if file_size and file_size.size > 1024 * 1024 then
+              return
+          end
+          -- Enable format-on-save for specific filetypes only
+          local format_on_save_filetypes = {python = true} -- Add other filetypes if needed
+          return {
+            timeout_ms = 500,
+            lsp_fallback = true,
+            quiet = true, -- Suppress messages on successful formatting
+          }, format_on_save_filetypes[vim.bo[bufnr].filetype]
+        end,
+        formatters_by_ft = {
+          lua = { 'stylua' },
+          -- python = { 'ruff_format' }, -- Use custom definition below
+          python = { 'ruff_uv' },
+          -- Add other filetypes and formatters here
+          -- javascript = { 'prettier' },
+          -- typescript = { 'prettier' },
+          -- html = { 'prettier' },
+          -- css = { 'prettier' },
+          -- json = { 'prettier' },
+          -- yaml = { 'prettier' },
+          -- markdown = { 'prettier' },
+        },
+        -- Define custom formatter to use uv run
+        formatters = {
+          ruff_uv = {
+            command = "uv",
+            -- Dynamically generate args to include --config if pyproject.toml is found
+            args = function(opts) -- opts contains { filename, range, ... }
+              local cwd = project_utils.find_project_root(vim.api.nvim_get_current_buf())
+              local base_args = {"run", "ruff", "format"}
+              local config_file = Path:new(cwd):joinpath('pyproject.toml')
+
+              if config_file:exists() then
+                vim.list_extend(base_args, {"--config", config_file:absolute()})
+              end
+
+              vim.list_extend(base_args, { "-" }) -- Add stdin marker at the end
+              return base_args
+            end,
+            cwd = project_utils.find_project_root, -- Use the helper function
+            stdin = true,
+          }
+        }
+      }
+    end
+  }
+
+  -- Add nvim-lint for linting
+  use {
+    'mfussenegger/nvim-lint',
+    requires = { "nvim-lua/plenary.nvim" },
+    config = function() -- Use config function scope
+      local project_utils = require('utils.project')
+      local Path = require('plenary.path') -- Still need Path for config file check
+
+      local lint = require('lint')
+      lint.linters_by_ft = {
+        python = {'ruff_uv'},
+        -- javascript = {'eslint_d'}, -- Example for other linters
+      }
+
+      lint.linters.ruff_uv = {
+        cmd = "uv",
+        cwd = project_utils.find_project_root, -- Set CWD using the helper
+        stdin = true,
+        ignore_exitcode = true, -- Ignore non-zero exit code from ruff on lint errors
+        parser = function() return require("lint.parser").from_json("body") end, -- Defer require call
+        -- Dynamically generate args to include --config if pyproject.toml is found
+        args = function(opts)
+          local cwd = project_utils.find_project_root(vim.api.nvim_get_current_buf())
+          local base_args = {"run", "ruff", "check", "--output-format", "json"}
+          local config_file = Path:new(cwd):joinpath('pyproject.toml')
+
+          if config_file:exists() then
+            vim.list_extend(base_args, {"--config", config_file:absolute()})
+          end
+
+          vim.list_extend(base_args, { "-" }) -- Add stdin marker at the end
+          return base_args
+        end,
+      }
+
+      -- Autocommand to trigger linting
+      vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
+        group = vim.api.nvim_create_augroup("lint", { clear = true }),
+        callback = function()
+          require("lint").try_lint()
+        end,
+      })
+    end,
+  }
+
   use { "nvim-telescope/telescope.nvim", requires = { "nvim-lua/plenary.nvim" } }
   use "tpope/vim-fugitive"
   use "tpope/vim-surround"
@@ -133,6 +240,10 @@ vim.api.nvim_create_autocmd("LspAttach", {
 vim.opt.completeopt = { "menu", "menuone", "noselect" }
 local cmp = require("cmp")
 local luasnip = require("luasnip")
+
+-- Load vscode-like snippets
+require("luasnip.loaders.from_vscode").lazy_load()
+
 cmp.setup({
   snippet = {
     expand = function(args)
@@ -145,14 +256,57 @@ cmp.setup({
     ["<C-Space>"] = cmp.mapping.complete(),
     ["<C-e>"] = cmp.mapping.abort(),
     ["<CR>"] = cmp.mapping.confirm({ select = true }),
+    ["<Tab>"] = cmp.mapping(function(fallback)
+      if cmp.visible() then
+        cmp.select_next_item()
+      elseif luasnip.expand_or_jumpable() then
+        luasnip.expand_or_jump()
+      else
+        fallback()
+      end
+    end, { "i", "s" }),
+    ["<S-Tab>"] = cmp.mapping(function(fallback)
+      if cmp.visible() then
+        cmp.select_prev_item()
+      elseif luasnip.jumpable(-1) then
+        luasnip.jump(-1)
+      else
+        fallback()
+      end
+    end, { "i", "s" }),
   }),
   sources = cmp.config.sources({
-    { name = "nvim_lsp" },
-    { name = "luasnip" },
-  }, {
-    { name = "buffer" },
-    { name = "path" },
+    { name = "nvim_lsp", priority = 1000 },  -- Give LSP suggestions highest priority
+    { name = "luasnip", priority = 750 },
+    { name = "buffer", priority = 500 },
+    { name = "path", priority = 250 },
   }),
+  sorting = {
+    comparators = {
+      cmp.config.compare.offset,
+      cmp.config.compare.exact,
+      cmp.config.compare.score,
+      cmp.config.compare.recently_used,
+      cmp.config.compare.kind,
+    }
+  },
+  -- Add window customization for better appearance
+  window = {
+    completion = cmp.config.window.bordered(),
+    documentation = cmp.config.window.bordered(),
+  },
+  formatting = {
+    format = function(entry, vim_item)
+      -- Show source name
+      vim_item.menu = ({
+        nvim_lsp = "[LSP]",
+        luasnip = "[Snippet]",
+        buffer = "[Buffer]",
+        path = "[Path]"
+      })[entry.source.name]
+      return vim_item
+    end
+  },
 })
 
 -- Telescope setup with keybindings
