@@ -210,8 +210,8 @@ end, { noremap = true })
 vim.keymap.set('n', 'soap', ':Files ~/.my_env_settings/prompts<CR>', { noremap = true })
 
 -- Swift save note mappings
-vim.keymap.set('n', 'ssn', ':w ~/.my_env_settings/Notes/<CR>', { noremap = true })
-vim.keymap.set('n', 'ssap', ':w ~/.my_env_settings/prompts/<CR>', { noremap = true })
+vim.keymap.set('n', 'ssn', ':w ~/.my_env_settings/Notes/', { noremap = true })
+vim.keymap.set('n', 'ssap', ':w ~/.my_env_settings/prompts/', { noremap = true })
 
 -- Swift cd mappings
 vim.keymap.set('n', 'scdp', 'icd ~/Code/<CR>', { noremap = true })

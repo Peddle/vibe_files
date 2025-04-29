@@ -23,6 +23,19 @@ require("plugins")
 -- Load LSP configuration
 require('lsp')
 
+-- Setup Treesitter
+require('nvim-treesitter.configs').setup {
+  ensure_installed = { "python", "lua", "vim", "vimdoc", "markdown", "json", "yaml", "bash" }, -- Add parsers you commonly use
+  sync_install = false,
+  auto_install = true,
+  highlight = {
+    enable = true,
+  },
+  indent = {
+    enable = false,
+  },
+}
+
 -- Then load configurations
 pcall(require, "core")
 pcall(require, "settings")
