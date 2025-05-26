@@ -97,10 +97,10 @@ vim.api.nvim_create_autocmd("TermOpen", {
 -- Tab naming configuration
 vim.api.nvim_create_user_command('TabRename', function(opts)
     if opts.args ~= '' then
-        vim.t.custom_tab_name = opts.args
+        vim.api.nvim_tabpage_set_var(0, 'custom_tab_name', opts.args)
         vim.opt_local.statusline = string.format(' %s ', opts.args)
     else
-        vim.t.custom_tab_name = nil
+        pcall(function() vim.api.nvim_tabpage_del_var(0, 'custom_tab_name') end)
         vim.opt_local.statusline = nil
     end
 end, { nargs = '?', desc = 'Rename current tab' })
@@ -133,7 +133,11 @@ _G.custom_tabline = function()
         tabline = tabline .. '%' .. i .. 'T'
         
         -- Get custom name or default to tab number
-        local success, custom_name = pcall(function() return vim.t[i].custom_tab_name end)
+        local tabpage = vim.api.nvim_list_tabpages()[i]
+        local success, custom_name = pcall(function() 
+            return vim.api.nvim_tabpage_get_var(tabpage, 'custom_tab_name') 
+        end)
+        
         if success and custom_name then
             tabline = tabline .. ' ' .. custom_name .. ' '
         else
