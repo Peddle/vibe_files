@@ -90,7 +90,7 @@ require("packer").startup(function(use)
               return
           end
           -- Enable format-on-save for specific filetypes only
-          local format_on_save_filetypes = {python = true} -- Add other filetypes if needed
+          local format_on_save_filetypes = {python = true, rust = true} -- Add other filetypes if needed
           return {
             timeout_ms = 500,
             lsp_fallback = true,
@@ -101,6 +101,7 @@ require("packer").startup(function(use)
           lua = { 'stylua' },
           -- python = { 'ruff_format' }, -- Use custom definition below
           python = { 'ruff_uv' },
+          rust = { 'rustfmt' },
           -- Add other filetypes and formatters here
           -- javascript = { 'prettier' },
           -- typescript = { 'prettier' },
@@ -379,9 +380,9 @@ require("copilot").setup({
   },
 })
 
--- Treesitter setup for Python, TypeScript, and TSX
+-- Treesitter setup for Python, TypeScript, TSX, and Rust
 require("nvim-treesitter.configs").setup({
-  ensure_installed = { "python", "typescript", "tsx" },
+  ensure_installed = { "python", "typescript", "tsx", "rust" },
   highlight = {
     enable = true,
     additional_vim_regex_highlighting = false,
