@@ -15,13 +15,7 @@ Step 2: ultrathink as hard as you can on the ideal plan to implement this featur
      - Remember also that backwards compatibility is never a requirement
      - save your plan as a .md file
 
-Step 3: Ask a subagent to find flaws in your plan and iterate
-     - Instruct the subagent to ultrathink as hard as possible about the plan and to explore any relevant code to try and 
- find flaws
-     - Use TODOs to track how many times you've run this step (you should run it at least 5 times)
-     - Integrate the feedback from the subagent before moving on to the next iteration
-
-Step 4: create a subagent to implement the plan. Give it the following instructions:
+Step 3: create a subagent to implement the plan. Give it the following instructions:
 ```subagent_instructions
    I need you to implement the following design doc: "design doc name"
 
@@ -35,6 +29,6 @@ Step 4: create a subagent to implement the plan. Give it the following instructi
  heavy use of subagents to understand the relevant existing code 
  ```
 
- Step 5: review acceptance criteria:
+ Step 4: review acceptance criteria:
    - follow any acceptance / validation criteria outlined in CLAUDE.md
 
