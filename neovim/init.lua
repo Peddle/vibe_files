@@ -176,6 +176,13 @@ vim.o.scrolloff = 10
 -- See `:help 'confirm'`
 vim.o.confirm = true
 
+-- [[ Indentation settings ]]
+-- Global defaults that work as fallbacks when guess-indent can't detect the pattern
+vim.o.expandtab = true      -- Convert tabs to spaces
+vim.o.tabstop = 2           -- Display tabs as 2 spaces
+vim.o.shiftwidth = 2        -- Use 2 spaces for indentation
+vim.o.softtabstop = 2       -- Make backspace work correctly with spaces
+
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
@@ -190,9 +197,6 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
 -- is not what someone will guess without a bit more experience.
 --
--- NOTE: This won't work in all terminal emulators/tmux/etc. Try your own mapping
--- or just use <C-\><C-n> to exit terminal mode
-vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
 -- Toggle between dark (mocha) and light (latte) Catppuccin themes
 vim.keymap.set('n', '<leader>tdm', function()
@@ -209,10 +213,10 @@ end, { desc = '[T]oggle [D]ark [M]ode (Catppuccin)' })
 --  Use CTRL+<hjkl> to switch between windows
 --
 --  See `:help wincmd` for a list of all window commands
-vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
-vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
-vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
-vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+vim.keymap.set({ 'n', 'i' }, '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
+vim.keymap.set({ 'n', 'i' }, '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
+vim.keymap.set({ 'n', 'i' }, '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
+vim.keymap.set({ 'n', 'i' }, '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
 -- NOTE: Some terminals have colliding keymaps or are not able to send distinct keycodes
 -- vim.keymap.set("n", "<C-S-h>", "<C-w>H", { desc = "Move window to the left" })
@@ -231,6 +235,42 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
   callback = function()
     vim.hl.on_yank()
+  end,
+})
+
+-- [[ Filetype-specific indentation ]]
+-- These settings work with guess-indent.nvim as fallbacks
+vim.api.nvim_create_autocmd('FileType', {
+  desc = 'Set filetype-specific indentation',
+  group = vim.api.nvim_create_augroup('kickstart-filetype-indent', { clear = true }),
+  pattern = {
+    'python',
+  },
+  callback = function()
+    vim.bo.expandtab = true
+    vim.bo.tabstop = 4
+    vim.bo.shiftwidth = 4
+    vim.bo.softtabstop = 4
+  end,
+})
+
+-- JavaScript/TypeScript files use 2 spaces (matching prettier config)
+vim.api.nvim_create_autocmd('FileType', {
+  desc = 'Set JavaScript/TypeScript indentation to 2 spaces',
+  group = vim.api.nvim_create_augroup('kickstart-js-ts-indent', { clear = true }),
+  pattern = {
+    'javascript',
+    'typescript',
+    'javascriptreact',
+    'typescriptreact',
+    'json',
+    'jsonc',
+  },
+  callback = function()
+    vim.bo.expandtab = true
+    vim.bo.tabstop = 2
+    vim.bo.shiftwidth = 2
+    vim.bo.softtabstop = 2
   end,
 })
 
@@ -708,8 +748,32 @@ require('lazy').setup({
         --    https://github.com/pmizio/typescript-tools.nvim
         --
         -- But for many setups, the LSP (`ts_ls`) will work just fine
-        -- ts_ls = {},
-        --
+        ts_ls = {
+          settings = {
+            typescript = {
+              inlayHints = {
+                includeInlayParameterNameHints = 'all',
+                includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+                includeInlayFunctionParameterTypeHints = true,
+                includeInlayVariableTypeHints = true,
+                includeInlayPropertyDeclarationTypeHints = true,
+                includeInlayFunctionLikeReturnTypeHints = true,
+                includeInlayEnumMemberValueHints = true,
+              },
+            },
+            javascript = {
+              inlayHints = {
+                includeInlayParameterNameHints = 'all',
+                includeInlayParameterNameHintsWhenArgumentMatchesName = false,
+                includeInlayFunctionParameterTypeHints = true,
+                includeInlayVariableTypeHints = true,
+                includeInlayPropertyDeclarationTypeHints = true,
+                includeInlayFunctionLikeReturnTypeHints = true,
+                includeInlayEnumMemberValueHints = true,
+              },
+            },
+          },
+        },
 
         lua_ls = {
           -- cmd = { ... },
@@ -745,6 +809,8 @@ require('lazy').setup({
         'stylua', -- Used to format Lua code
         'black', -- Python formatter
         'isort', -- Python import sorter
+        'prettierd', -- JavaScript/TypeScript formatter (faster than prettier)
+        'prettier', -- JavaScript/TypeScript formatter (fallback)
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -801,7 +867,11 @@ require('lazy').setup({
         python = { "isort", "black" },
         --
         -- You can use 'stop_after_first' to run the first available formatter from the list
-        -- javascript = { "prettierd", "prettier", stop_after_first = true },
+        javascript = { "prettierd", "prettier", stop_after_first = true },
+        typescript = { "prettierd", "prettier", stop_after_first = true },
+        javascriptreact = { "prettierd", "prettier", stop_after_first = true },
+        typescriptreact = { "prettierd", "prettier", stop_after_first = true },
+        json = { "prettierd", "prettier", stop_after_first = true },
       },
     },
   },
@@ -951,12 +1021,7 @@ require('lazy').setup({
       --  - ci'  - [C]hange [I]nside [']quote
       require('mini.ai').setup { n_lines = 500 }
 
-      -- Add/delete/replace surroundings (brackets, quotes, etc.)
-      --
-      -- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
-      -- - sd'   - [S]urround [D]elete [']quotes
-      -- - sr)'  - [S]urround [R]eplace [)] [']
-      require('mini.surround').setup()
+      -- Note: vim-surround is configured separately below as a standalone plugin
 
       -- Simple and easy statusline.
       --  You could remove this setup call if you don't like it,
@@ -983,7 +1048,7 @@ require('lazy').setup({
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' },
+      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'typescript', 'javascript', 'tsx', 'json' },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
@@ -1018,6 +1083,69 @@ require('lazy').setup({
   -- require 'kickstart.plugins.autopairs',
   -- require 'kickstart.plugins.neo-tree',
   -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
+
+  -- GitHub Copilot
+  {
+    'zbirenbaum/copilot.lua',
+    cmd = 'Copilot',
+    event = 'InsertEnter',
+    config = function()
+      require('copilot').setup({
+        suggestion = {
+          auto_trigger = true,
+          keymap = {
+            accept = '<C-a>',
+            accept_word = false,
+            accept_line = false,
+            next = '<M-]>',
+            prev = '<M-[>',
+            dismiss = '<C-]>',
+          },
+        },
+        panel = {
+          enabled = true,
+          auto_refresh = false,
+          keymap = {
+            jump_prev = '[[',
+            jump_next = ']]',
+            accept = '<CR>',
+            refresh = 'gr',
+            open = '<M-CR>',
+          },
+        },
+        copilot_node_command = 'node',
+      })
+    end,
+  },
+
+  -- Window resizer
+  {
+    'simeji/winresizer',
+    keys = {
+      { '<C-e>', '<cmd>WinResizerStartResize<CR>', desc = 'Start window resize mode' },
+    },
+  },
+
+  -- Git integration
+  {
+    'tpope/vim-fugitive',
+    cmd = { 'Git', 'Gstatus', 'Gblame', 'Gpush', 'Gpull' },
+    keys = {
+      { '<leader>gs', '<cmd>Git<CR>', desc = 'Git status' },
+      { '<leader>bl', '<cmd>Git blame<CR>', desc = 'Git blame' },
+    },
+  },
+
+  -- Surround text objects
+  {
+    'tpope/vim-surround',
+    keys = {
+      { 'ys', mode = 'n' },
+      { 'cs', mode = 'n' },
+      { 'ds', mode = 'n' },
+      { 'S', mode = 'v' },
+    },
+  },
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    This is the easiest way to modularize your config.
@@ -1055,3 +1183,4 @@ require('lazy').setup({
 -- vim: ts=2 sts=2 sw=2 et
 
 require 'core.mappings'
+require 'core.tabs'
